@@ -185,7 +185,7 @@ int main(int argc, char *argv[])
             strcat(packet_filter, iptos(((struct sockaddr_in *)a->addr)->sin_addr.s_addr));
         }
     }
-//    strcat(packet_filter, " and udp");
+    strcat(packet_filter, " and not (tcp[tcpflags] & tcp-syn != 0)");
     printf("packet_filter: %s\n", packet_filter);
 
     //compile the filter
