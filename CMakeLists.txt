@@ -1,0 +1,10 @@
+project(CnRexmit)
+cmake_minimum_required(VERSION 2.8)
+include_directories(./WpdPack)
+include_directories(./libGeoIP)
+aux_source_directory(./libGeoIP SRC_LIST)
+aux_source_directory(. SRC_LIST)
+add_executable(${PROJECT_NAME} ${SRC_LIST})
+
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} D:/Qt/projects/WpdPack/Lib/libwpcap.a ws2_32)
+set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static -s")
