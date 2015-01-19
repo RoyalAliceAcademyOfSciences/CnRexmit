@@ -47,7 +47,7 @@ static pcap_t *adhandle;
 
 /* Anti-repeatsend list */
 #define SENDLISTSIZE 0xff
-static u_short sendlist[SENDLISTSIZE];
+static u_int32_t sendlist[SENDLISTSIZE];
 static u_short sendlist_head = 0;
 
 int main(int argc, char *argv[])
@@ -225,6 +225,7 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_cha
     ip_header *ih;
     u_int ip_len;
     time_t local_tv_sec;
+    u_int ide_crc;
 
     int country_id;
     const char *country_code;
@@ -240,8 +241,9 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_cha
     /* retireve the position of the ip header */
     ih = (ip_header *) (pkt_data + 14); //length of ethernet header
 
-    for(i=0; i<SENDLISTSIZE; ++i)
-        if(sendlist[i] == ih->crc)
+    ide_crc = ih->crc + (ih->identification << 16);
+    for(i=0; i < SENDLISTSIZE; ++i)
+        if(sendlist[i] == ide_crc)
             return;
 
     /* geoip */
@@ -264,29 +266,25 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_cha
     strftime( timestr, sizeof timestr, "%H:%M:%S", &ltime);
 
     /* print timestamp and length of the packet */
-    printf("%s.%.6d len:%d ", timestr, header->ts.tv_usec, header->len);
+    printf("%s.%.6d LEN:%04x ", timestr, header->ts.tv_usec, header->len);
+    printf("IDX:%02x IDECRC:%08x ", sendlist_head, ide_crc);
 
     /* retireve the position of the udp header */
     ip_len = (ih->ver_ihl & 0xf) * 4;
 
     /* print ip addresses and udp ports */
 
-    printf("%d.%d.%d.%d -> %d.%d.%d.%d [%s, %s]\n",
-           ih->saddr.byte1,
-           ih->saddr.byte2,
-           ih->saddr.byte3,
-           ih->saddr.byte4,
+    printf("DST:[%s] %d.%d.%d.%d\n",
+           country_code,
            ih->daddr.byte1,
            ih->daddr.byte2,
            ih->daddr.byte3,
-           ih->daddr.byte4,
-           country_code,
-           country_name
+           ih->daddr.byte4
            );
 
     /* Send down the packet */
-    sendlist[sendlist_head++] = ih->crc;
-    if(sendlist_head >= SENDLISTSIZE)
+    sendlist[sendlist_head++] = ide_crc;
+    if(sendlist_head > SENDLISTSIZE)
         sendlist_head = 0;
 
     if (pcap_sendpacket(adhandle, pkt_data, header->caplen /* size */) != 0)
