@@ -46,8 +46,8 @@ static int country_id_target = 0;
 static pcap_t *adhandle;
 
 /* Anti-repeatsend list */
-#define SENDLISTSIZE 0xff
-static u_int32_t sendlist[SENDLISTSIZE];
+#define SENDLISTSIZE 1024
+static u_int32_t sendlist[SENDLISTSIZE+1];
 static u_short sendlist_head = 0;
 
 int main(int argc, char *argv[])
@@ -266,8 +266,8 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_cha
     strftime( timestr, sizeof timestr, "%H:%M:%S", &ltime);
 
     /* print timestamp and length of the packet */
-    printf("%s.%.6d LEN:%04x ", timestr, header->ts.tv_usec, header->len);
-    printf("IDX:%02x IDECRC:%08x ", sendlist_head, ide_crc);
+    printf("%s.%.6d LEN:%03x ", timestr, header->ts.tv_usec, header->len);
+    printf("IDX:%03x IDECRC:%08x ", sendlist_head, ide_crc);
 
     /* retireve the position of the udp header */
     ip_len = (ih->ver_ihl & 0xf) * 4;
