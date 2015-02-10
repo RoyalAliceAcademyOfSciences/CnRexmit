@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "GeoIP.h"
-#define HAVE_REMOTE
 #include "pcap.h"
 
 /* 4 bytes IP address */
@@ -54,7 +53,7 @@ int main(int argc, char *argv[])
 {
     int arg_count;
     int arg_inum=0;
-    char arg_country[0xff] = "CN";
+    char arg_country[8] = "CN";
     pcap_if_t *alldevs;
     pcap_if_t *d;
     int i=0;
@@ -229,7 +228,6 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_cha
 
     int country_id;
     const char *country_code;
-    const char *country_name;
 
     int i;
 
@@ -249,7 +247,6 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_cha
     /* geoip */
     country_id = GeoIP_id_by_ipnum(gi, ntohl(ih->daddrint));
     country_code = GeoIP_country_code[country_id];
-    country_name = GeoIP_country_name[country_id];
     //dst is n/a
     if(country_id == 0)
         return;
