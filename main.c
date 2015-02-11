@@ -132,30 +132,25 @@ int main(int argc, char *argv[])
             printf(" (%s)", d->description);
         else
             printf(" (No description available)");
-		if (d->addresses)
-		{
-			printf("\nIP: [");
-			struct pcap_addr *taddr;
-			struct sockaddr_in *sin;
-			char  revIP[100];
-			for (taddr = d->addresses; taddr; taddr = taddr->next)
-			{
-				sin = (struct sockaddr_in *)taddr->addr;
-				switch (sin->sin_family){
-				case    AF_INET:
-					strcpy(revIP, inet_ntoa(sin->sin_addr));
-					break;
-				case    AF_INET6:
-//					inet_ntop(AF_INET6, sin, revIP, INET6_ADDRSTRLEN); // undefined reference to `inet_ntop'
-					break;
-				}
-				printf("%s", revIP);
-				if (taddr->next)
-					putchar(',');
-			}
-			putchar(']');
-		}
-		putchar('\n');
+        if (d->addresses)
+        {
+            printf("\nIP: [");
+            struct pcap_addr *taddr;
+            struct sockaddr_in *sin;
+            char  revIP[100];
+            for (taddr = d->addresses; taddr; taddr = taddr->next)
+            {
+                sin = (struct sockaddr_in *)taddr->addr;
+                if (sin->sin_family == AF_INET){
+                    strcpy(revIP, inet_ntoa(sin->sin_addr));
+                    printf("%s", revIP);
+                    if (taddr->next)
+                        putchar(',');
+                }
+            }
+            putchar(']');
+        }
+        putchar('\n');
     }
 
     if(i==0)
