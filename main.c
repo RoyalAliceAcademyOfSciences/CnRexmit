@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include "GeoIP.h"
 #include "pcap.h"
 
@@ -49,6 +50,13 @@ static pcap_t *adhandle;
 static u_int32_t sendlist[SENDLISTSIZE+1];
 static u_short sendlist_head = 0;
 
+/* if we're built against a version of geoip-api-c that doesn't define this,
+ * the flag should be harmless (as long as it doesn't clash with another
+ * flag using the same bit position). */
+#ifndef GEOIP_SILENCE
+#define GEOIP_SILENCE		16
+#endif
+
 int main(int argc, char *argv[])
 {
     int arg_count;
@@ -62,6 +70,7 @@ int main(int argc, char *argv[])
     pcap_addr_t *a;
     char packet_filter[0xffff] = {0};
     struct bpf_program fcode;
+    int result = 0;
 
     if (argc > 1)
     {
@@ -104,7 +113,12 @@ int main(int argc, char *argv[])
     printf("country_id_target: %d\n", country_id_target);
 
     /* Retrieve the device list */
-    if (pcap_findalldevs_ex(PCAP_SRC_IF_STRING, NULL, &alldevs, errbuf) == -1)
+#ifdef _WIN32
+    result = pcap_findalldevs_ex(PCAP_SRC_IF_STRING, NULL, &alldevs, errbuf);
+#elif __unix
+    result = pcap_findalldevs(&alldevs, errbuf);
+#endif
+    if (result == -1)
     {
         fprintf(stderr,"Error in pcap_findalldevs: %s\n", errbuf);
         exit(1);
@@ -153,7 +167,7 @@ int main(int argc, char *argv[])
     if (arg_inum == 0)
     {
         printf("Enter the interface number (1-%d):",i);
-        scanf_s("%d", &arg_inum);
+        scanf("%d", &arg_inum);
     }
 
     if(arg_inum < 1 || arg_inum > i)
@@ -168,14 +182,25 @@ int main(int argc, char *argv[])
     for(d=alldevs, i=0; i< arg_inum-1 ;d=d->next, i++);
 
     /* Open the adapter */
-    if ( (adhandle= pcap_open(d->name,  // name of the device
-                              65536,     // portion of the packet to capture.
-                              // 65536 grants that the whole packet will be captured on all the MACs.
-                              PCAP_OPENFLAG_PROMISCUOUS,         // promiscuous mode
-                              1000,      // read timeout
-                              NULL,      // remote authentication
-                              errbuf     // error buffer
-                              ) ) == NULL)
+#ifdef _WIN32
+    adhandle= pcap_open(d->name,  // name of the device
+                                  65536,     // portion of the packet to capture.
+                                  // 65536 grants that the whole packet will be captured on all the MACs.
+                                  PCAP_OPENFLAG_PROMISCUOUS,         // promiscuous mode
+                                  1000,      // read timeout
+                                  NULL,      // remote authentication
+                                  errbuf     // error buffer
+                                  );
+#elif __unix
+    adhandle= pcap_open_live(d->name,  // name of the device
+                                  65536,     // portion of the packet to capture.
+                                  // 65536 grants that the whole packet will be captured on all the MACs.
+                                  1,         // promiscuous mode
+                                  1000,      // read timeout
+                                  errbuf     // error buffer
+                                  );
+#endif
+    if ( adhandle == NULL)
     {
         fprintf(stderr,"\nUnable to open the adapter. %s is not supported by WinPcap\n");
         /* Free the device list */
@@ -194,7 +219,11 @@ int main(int argc, char *argv[])
 
     if(d->addresses != NULL)
         /* Retrieve the mask of the first address of the interface */
+#ifdef _WIN32
         netmask=((struct sockaddr_in *)(d->addresses->netmask))->sin_addr.S_un.S_addr;
+#elif __unix
+        netmask=0xffffff;
+#endif
     else
         /* If the interface is without addresses we suppose to be in a C class network */
         netmask=0xffffff;
@@ -258,7 +287,7 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_cha
     /*
      * Unused variable
      */
-    (VOID)(param);
+    (void)(param);
 
     /* retireve the position of the ip header */
     ih = (ip_header *) (pkt_data + 14); //length of ethernet header
@@ -325,6 +354,6 @@ char *iptos(u_long in)
 
     p = (u_char *)&in;
     which = (which + 1 == IPTOSBUFFERS ? 0 : which + 1);
-    _snprintf_s(output[which], sizeof(output[which]), sizeof(output[which]),"%d.%d.%d.%d", p[0], p[1], p[2], p[3]);
+    snprintf(output[which], sizeof(output[which]), "%d.%d.%d.%d", p[0], p[1], p[2], p[3]);
     return output[which];
 }

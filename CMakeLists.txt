@@ -20,4 +20,6 @@ if(WIN32)
     set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static -s")
 endif(WIN32)
 
-
+if(UNIX)
+    TARGET_LINK_LIBRARIES(${PROJECT_NAME} pcap GeoIP)
+endif(UNIX)
