@@ -1,16 +1,16 @@
-CnRexmitÊÇÒ»¿îÓÃÓÚÓ¦¶ÔGFWËæ»ú¶ª°üµÄÐ¡¹¤¾ß£¬Í¬Ê±Ö§³ÖÔÚÇ½Íâ»òÔÚÇ½ÄÚÊ¹ÓÃ£¬¿ÉÒÔ°Ñ¹ýÇ½Êý¾ÝµÄ¶ª°üÂÊ´Ó50%×óÓÒ½µµÍµ½22%×óÓÒ£¬Í¨¹ýÔö¼ÓÈßÓàÎþÉü´ø¿íµÄ·½Ê½À´»»È¡Á¬½ÓµÄÎÈ¶¨ÐÔ¡£
+CnRexmitæ˜¯ä¸€æ¬¾ç”¨äºŽåº”å¯¹GFWéšæœºä¸¢åŒ…çš„å°å·¥å…·ï¼ŒåŒæ—¶æ”¯æŒåœ¨å¢™å¤–æˆ–åœ¨å¢™å†…ä½¿ç”¨ï¼Œå¯ä»¥æŠŠè¿‡å¢™æ•°æ®çš„ä¸¢åŒ…çŽ‡ä»Ž50%å·¦å³é™ä½Žåˆ°22%å·¦å³ï¼Œé€šè¿‡å¢žåŠ å†—ä½™ç‰ºç‰²å¸¦å®½çš„æ–¹å¼æ¥æ¢å–è¿žæŽ¥çš„ç¨³å®šæ€§ã€‚
 
-#±àÒëËµÃ÷£º
-##Windows»·¾³£º
-ÐèÒª WinPcap 4.1.2 Developer's Pack ÏÂÔØµØÖ·£ºhttp://www.winpcap.org/devel.htm
-CMakeLists.txt±àÐ´²¢²»¹æ·¶£¬TARGET_LINK_LIBRARIESÖÐ°üº¬ WinPcap ¿âµÄÎ»ÖÃÊÇ±¾»úµÄÓ²±àÂë£¬Çë¸ù¾ÝÐèÒª×ÔÐÐÐÞ¸ÄÂ·¾¶¡£
-##Linux»·¾³£º
-ÐèÒª libpcap Óë libgeoip ¿âÖ§³Ö
+#ç¼–è¯‘è¯´æ˜Ž
+##WindowsçŽ¯å¢ƒ
+éœ€è¦ WinPcap 4.1.2 Developer's Pack ä¸‹è½½åœ°å€ï¼šhttp://www.winpcap.org/devel.htm
+CMakeLists.txtç¼–å†™å¹¶ä¸è§„èŒƒï¼ŒTARGET_LINK_LIBRARIESä¸­åŒ…å« WinPcap åº“çš„ä½ç½®æ˜¯æœ¬æœºçš„ç¡¬ç¼–ç ï¼Œè¯·æ ¹æ®éœ€è¦è‡ªè¡Œä¿®æ”¹è·¯å¾„ã€‚
+##LinuxçŽ¯å¢ƒ
+éœ€è¦ libpcap ä¸Ž libgeoip åº“æ”¯æŒ
 
-Ê¹ÓÃ·½·¨£º
+#ä½¿ç”¨æ–¹æ³•
 CnRexmit [-i inteface] [-c Country Code] [-o]
 
-²ÎÊýËµÃ÷£º
--i Íø¿¨ID£¬²»Ê¹ÓÃ´Ë²ÎÊýÊ±ËùÓÐÍø¿¨µÄID»áÔÚÁÐ±íÖÐÏÔÊ¾£¬ÐèÊÖ¶¯ÊäÈë
--c ¹ú¼Ò´úÂë£¬Ä¬ÈÏÎªCN£¬Í¨³£²»ÐèÒª×ö¸ü¸Ä
--o ÔÚÇ½ÍâµÄÍ¬Ñ§ÇëÔö¼Ó´Ë²ÎÊý£¬ÓÃÓÚ·´×ª¹¤×÷Ä£Ê½£¬½«·¢ÍùÇ½ÄÚµÄÊý¾Ý°ü¼Ó±¶
+#å‚æ•°è¯´æ˜Ž
+-i ç½‘å¡IDï¼Œä¸ä½¿ç”¨æ­¤å‚æ•°æ—¶æ‰€æœ‰ç½‘å¡çš„IDä¼šåœ¨åˆ—è¡¨ä¸­æ˜¾ç¤ºï¼Œéœ€æ‰‹åŠ¨è¾“å…¥
+-c å›½å®¶ä»£ç ï¼Œé»˜è®¤ä¸ºCNï¼Œé€šå¸¸ä¸éœ€è¦åšæ›´æ”¹
+-o åœ¨å¢™å¤–çš„åŒå­¦è¯·å¢žåŠ æ­¤å‚æ•°ï¼Œç”¨äºŽåè½¬å·¥ä½œæ¨¡å¼ï¼Œå°†å‘å¾€å¢™å†…çš„æ•°æ®åŒ…åŠ å€
