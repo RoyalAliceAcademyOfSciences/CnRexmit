@@ -229,15 +229,17 @@ int main(int argc, char *argv[])
         netmask=0xffffff;
 
     //build the filter
-    strcat(packet_filter, "ip");
+    strcat(packet_filter, "(ip ");
     for(a=d->addresses;a;a=a->next) {
         if(a->addr->sa_family == AF_INET && a->addr)
         {
-            strcat(packet_filter, " src ");
+            strcat(packet_filter, "src ");
             strcat(packet_filter, iptos(((struct sockaddr_in *)a->addr)->sin_addr.s_addr));
+            strcat(packet_filter, " or ");
         }
     }
-    strcat(packet_filter, " and not (tcp[tcpflags] & tcp-syn != 0)");
+    packet_filter[strlen(packet_filter) - 4] = 0;
+    strcat(packet_filter, ") and not (tcp[tcpflags] & tcp-syn != 0)");
     printf("packet_filter: %s\n", packet_filter);
 
     //compile the filter
