@@ -106,6 +106,9 @@ int main(int argc, char *argv[])
 
             if(strcmp(argv[arg_count], "-o") == 0)
                 arg_outside = 1;
+
+            if(strcmp(argv[arg_count], "-g") == 0)
+                arg_gain = atoi(argv[arg_count+1]);
         }
         printf("the interface number(-i): %d\n", arg_inum);
     }
