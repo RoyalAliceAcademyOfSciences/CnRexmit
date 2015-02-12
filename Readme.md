@@ -20,7 +20,7 @@ CMakeLists.txt 编写并不规范，TARGET_LINK_LIBRARIES 中包含 WinPcap 库�
 
 ## 使用方法
 
-CnRexmit [-h] [-i inteface] [-c Country Code] [-o]
+CnRexmit [-h] [-i inteface] [-c Country Code] [-o] [-g gain]
 
 ## 参数说明
 
@@ -31,6 +31,8 @@ CnRexmit [-h] [-i inteface] [-c Country Code] [-o]
   - `-c` 国家代码，默认为 CN，通常不需要做更改
 
   - `-o` 在墙外的同学请增加此参数，用于反转工作模式，将发往墙内的数据包加倍
+  
+  - `-g` 增加发送数据包的数量，默认为 1 ，设置过大可能会导致上行带宽浪费
 
 ## 授权
 

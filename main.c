@@ -382,5 +382,5 @@ char *iptos(u_long in)
 
 void print_usage()
 {
-  printf("CnRexmit [-i inteface] [-c Country Code] [-o]\n");
+  printf("CnRexmit [-i inteface] [-c Country Code] [-o] [-g gain]\n");
 }
