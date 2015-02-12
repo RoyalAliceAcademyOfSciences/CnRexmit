@@ -6,6 +6,7 @@ CnRexmit是一款用于应对GFW随机丢包的小工具，同时支持在墙外
 CMakeLists.txt编写并不规范，TARGET_LINK_LIBRARIES中包含 WinPcap 库的位置是本机的硬编码，请根据需要自行修改路径。
 ##Linux环境
 需要 libpcap 与 libgeoip 库支持
+`gcc -lpcap -lGeoIP main.c -o CnRexmit`
 
 #使用方法
 CnRexmit [-i inteface] [-c Country Code] [-o]
