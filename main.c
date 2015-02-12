@@ -12,6 +12,14 @@ typedef struct ip_address{
     u_char byte4;
 }ip_address;
 
+/* Anti-repeatsend list struct*/
+#define SENDLISTSIZE 1024
+typedef struct list_sentpacket{
+    u_int32_t ide_crc[SENDLISTSIZE+1];
+    //    u_int8_t count[SENDLISTSIZE+1];
+    u_short head;
+}list_sentpacket;
+
 /* IPv4 header */
 typedef struct ip_header{
     u_char  ver_ihl;        // Version (4 bits) + Internet header length (4 bits)
@@ -48,10 +56,11 @@ static int country_id_target = 0;
 /* pcap handle */
 static pcap_t *adhandle;
 
-/* Anti-repeatsend list */
-#define SENDLISTSIZE 1024
-static u_int32_t sendlist[SENDLISTSIZE+1];
-static u_short sendlist_head = 0;
+/* Anti-repeatsend list struct*/
+static list_sentpacket sentlist;
+
+/* Gain times */
+static int arg_gain=1;
 
 /* if we're built against a version of geoip-api-c that doesn't define this,
  * the flag should be harmless (as long as it doesn't clash with another
@@ -305,7 +314,7 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_cha
 
     ide_crc = ih->crc + (ih->identification << 16);
     for(i=0; i < SENDLISTSIZE; ++i)
-        if(sendlist[i] == ide_crc)
+        if(sentlist.ide_crc[i] == ide_crc)
             return;
 
     /* geoip */
@@ -328,7 +337,7 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_cha
 
     /* print timestamp and length of the packet */
     printf("%s.%.6d LEN:%03x ", timestr, header->ts.tv_usec, header->len);
-    printf("IDX:%03x IDECRC:%08x ", sendlist_head, ide_crc);
+    printf("IDX:%03x IDECRC:%08x ", sentlist.head, ide_crc);
 
     /* retireve the position of the udp header */
     ip_len = (ih->ver_ihl & 0xf) * 4;
@@ -343,16 +352,18 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_cha
            ih->daddr.byte4
            );
 
-    /* Send down the packet */
-    sendlist[sendlist_head++] = ide_crc;
-    if(sendlist_head > SENDLISTSIZE)
-        sendlist_head = 0;
+    sentlist.ide_crc[sentlist.head] = ide_crc;
+    sentlist.head++;
+    if(sentlist.head > SENDLISTSIZE)
+        sentlist.head = 0;
 
-    if (pcap_sendpacket(adhandle, pkt_data, header->caplen /* size */) != 0)
-    {
-        fprintf(stderr,"\nError sending the packet: %s\n", pcap_geterr(adhandle));
-        return;
-    }
+    /* Send down the packet */
+    for(i=0; i<arg_gain; i++)
+        if (pcap_sendpacket(adhandle, pkt_data, header->caplen /* size */) != 0)
+        {
+            fprintf(stderr,"\nError sending the packet: %s\n", pcap_geterr(adhandle));
+            return;
+        }
 }
 
 /* From tcptraceroute, convert a numeric IP address to a string */
