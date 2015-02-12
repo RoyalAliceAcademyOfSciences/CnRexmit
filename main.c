@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
-#include "GeoIP.h"
-#include "pcap.h"
+#include <GeoIP.h>
+#include <pcap/pcap.h>
 
 /* 4 bytes IP address */
 typedef struct ip_address{
@@ -32,6 +32,9 @@ typedef struct ip_header{
     };
     u_int   op_pad;         // Option + Padding
 }ip_header;
+
+/* usage */
+void print_usage();
 
 /* prototype of the packet handler */
 void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data);
@@ -81,6 +84,11 @@ int main(int argc, char *argv[])
 //        }
         for (arg_count = 1; arg_count < argc; arg_count++)
         {
+            if(strcmp(argv[arg_count], "-h") == 0) {
+              print_usage();
+              exit(0);
+            }
+
             if(strcmp(argv[arg_count], "-i") == 0)
                 arg_inum = atoi(argv[arg_count+1]);
 
@@ -127,30 +135,35 @@ int main(int argc, char *argv[])
     /* Print the list */
     for(d=alldevs; d; d=d->next)
     {
-        printf("%d. %s", ++i, d->name);
-        if (d->description)
-            printf(" (%s)", d->description);
-        else
-            printf(" (No description available)");
-        if (d->addresses)
-        {
-            printf("\nIP: [");
-            struct pcap_addr *taddr;
-            struct sockaddr_in *sin;
-            char  revIP[100];
-            for (taddr = d->addresses; taddr; taddr = taddr->next)
+        if (arg_inum == 0) {
+            printf("%d. %s", ++i, d->name);
+            if (d->description)
+                printf(" (%s)", d->description);
+            else
+                printf(" (No description available)");
+
+            if (d->addresses)
             {
-                sin = (struct sockaddr_in *)taddr->addr;
-                if (sin->sin_family == AF_INET){
-                    strcpy(revIP, inet_ntoa(sin->sin_addr));
-                    printf("%s", revIP);
-                    if (taddr->next)
-                        putchar(',');
+                printf("\nIP: [");
+                struct pcap_addr *taddr;
+                struct sockaddr_in *sin;
+                char  revIP[100];
+                for (taddr = d->addresses; taddr; taddr = taddr->next)
+                {
+                    sin = (struct sockaddr_in *)taddr->addr;
+                    if (sin->sin_family == AF_INET){
+                        strcpy(revIP, inet_ntoa(sin->sin_addr));
+                        printf("%s", revIP);
+                        if (taddr->next)
+                            putchar(',');
+                    }
                 }
+                putchar(']');
             }
-            putchar(']');
+            putchar('\n');
+        } else {
+            ++i;
         }
-        putchar('\n');
     }
 
     if(i==0)
@@ -177,6 +190,7 @@ int main(int argc, char *argv[])
     for(d=alldevs, i=0; i< arg_inum-1 ;d=d->next, i++);
 
     /* Open the adapter */
+    memset(errbuf, 0, PCAP_ERRBUF_SIZE * sizeof(char));
 #ifdef _WIN32
     adhandle= pcap_open(d->name,  // name of the device
                                   65536,     // portion of the packet to capture.
@@ -197,7 +211,7 @@ int main(int argc, char *argv[])
 #endif
     if ( adhandle == NULL)
     {
-        fprintf(stderr,"\nUnable to open the adapter. %s is not supported by WinPcap\n");
+        fprintf(stderr,"\nUnable to open the adapter. %s is not supported by WinPcap\n%s\n", d->name, errbuf);
         /* Free the device list */
         pcap_freealldevs(alldevs);
         return -1;
@@ -255,7 +269,7 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    printf("\nlistening on %s...\n", d->description);
+    printf("\nlistening on %s (%s)...\n", d->name, d->description ? d->description : "No description available");
 
     /* At this point, we don't need any more the device list. Free it */
     pcap_freealldevs(alldevs);
@@ -353,4 +367,9 @@ char *iptos(u_long in)
     which = (which + 1 == IPTOSBUFFERS ? 0 : which + 1);
     snprintf(output[which], sizeof(output[which]), "%d.%d.%d.%d", p[0], p[1], p[2], p[3]);
     return output[which];
+}
+
+void print_usage()
+{
+  printf("CnRexmit [-i inteface] [-c Country Code] [-o]\n");
 }
