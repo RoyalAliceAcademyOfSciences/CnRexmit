@@ -1,7 +1,8 @@
 # CnRexmit
 
-CnRexmit 是一款用于应对 GFW 随机丢包的小工具，同时支持在墙外或在墙内使用，
-可以把过墙数据的丢包率从 50% 左右降低到 22% 左右，通过增加冗余牺牲带宽的方式来换取连接的稳定性。
+CnRexmit 是一款用于应对 GFW 随机丢包的小工具，同时支持在墙外或在墙内使用。
+
+使用本工具可以把过墙数据的丢包率从 50% 左右降低到 22% 左右，通过增加冗余牺牲带宽的方式来换取连接的稳定性。
 
 ## 编译说明
 
@@ -9,7 +10,7 @@ CnRexmit 是一款用于应对 GFW 随机丢包的小工具，同时支持在墙
 
 需要 WinPcap 4.1.2 Developer's Pack 下载地址： http://www.winpcap.org/devel.htm
 
-CMakeLists.txt编写并不规范， TARGET_LINK_LIBRARIES 中包含 WinPcap 库的位置是本机的硬编码，请根据需要自行修改路径。
+CMakeLists.txt 编写并不规范，TARGET_LINK_LIBRARIES 中包含 WinPcap 库的位置是本机的硬编码，请根据需要自行修改路径。
 
 ### Linux 环境
 
